@@ -1,7 +1,7 @@
 Public IP         Private IP         Instance
 -----------------------------------------------------
-#18.221.89.45     172.31.37.122   --srs_ec2_test1
-#3.16.100.194     172.31.38.37    --srs_ec2_test2
+#PUBLIC_IP1     172.31.37.122   --srs_ec2_test1
+#PUBLIC_IP2     172.31.38.37    --srs_ec2_test2
 
 Run following steps in parallel on both instances.
 
@@ -51,7 +51,6 @@ sudo grep 'temporary password' /var/log/mysqld.log
 mysql -u root -p
 
 ALTER USER 'root'@'localhost' IDENTIFIED BY 'gbXb):kyz2yt1';
-ALTER USER 'root'@'%' IDENTIFIED BY 'root';
 
 SHOW VARIABLES LIKE 'validate_password%';
 SET GLOBAL validate_password_length=4;
@@ -60,27 +59,22 @@ SET GLOBAL validate_password_number_count=0;
 SET GLOBAL validate_password_special_char_count=0;
 SET GLOBAL validate_password_policy=LOW;
 
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
-
-CREATE USER 'neon-user'@'%' IDENTIFIED BY 'neon-user';
-GRANT ALL PRIVILEGES ON *.* TO 'neon-user'@'%' IDENTIFIED BY 'neon-user' WITH GRANT OPTION;
+CREATE USER 'neon-user'@'%' IDENTIFIED BY 'neon-user-password';
+GRANT ALL PRIVILEGES ON *.* TO 'neon-user'@'%' IDENTIFIED BY 'neon-user-password' WITH GRANT OPTION;
 
 #setup auto login to user
 sudo -i
 cat >  .my.cnf
 [client]
 user=neon-user
-password=neon-user
+password=neon-user-password
 ctrl+c
 
 ---------------------------------------- 4. Replication User Setup ----------------------------------------
 
 #mysql add replication user
 mysql
-GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%' IDENTIFIED BY 'replica';
+GRANT REPLICATION SLAVE ON *.* TO 'replica'@'%' IDENTIFIED BY 'replica-password';
 FLUSH PRIVILEGES;
 quit;
 
----------------------------------------- 5. Follow Sequences ----------------------------------------
-
-server 1 export mysql db.
